@@ -1,0 +1,172 @@
+Validation Sýnýfý:
+
+var Validation = function() {
+
+};
+
+Validation.prototype.isValidEmail= function (string) {
+    var at="@";
+    var dot=".";
+    var indexAt= string.indexOf(at);
+    var indexDot= string.indexOf(dot,indexAt);
+    var tempString;
+    regEx = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    
+    if(string) {
+        //osman.yuksel@tart tarzýnda bir e-posta için kontrol.
+        //@'den sonra hiç nokta yoksa invalid.
+        if(string.indexOf(dot,indexAt)== -1){
+            return "invalid e-mail alert 1";
+        }
+        //@'den sonra en az bir nokta varsa.
+        else if(string.indexOf(dot,indexAt)!= -1) {
+        //eðer bir nokta varsa.
+            if(string.indexOf(dot, (indexDot+1))== -1) {
+                //o noktadan sonraki alan 4 karakterden büyük olmamalý.
+                tempString = string.substring(indexDot+1);
+                if(tempString.length>4) {
+                    return "invalid e-mail alert 2";
+                }
+            }
+            //eðer iki nokta varsa.
+            else{
+                var secondDot= string.indexOf(dot,(indexDot+1));
+                //ikinci noktadan sonraki alan 4 karakterden büyük olmamalý.
+                tempString=string.substring(secondDot+1);
+                if(tempString.length>4) {
+                    return "invalid e-mail alert 2";
+                }
+            }
+        }
+        //türkçe karakterler varsa invalid.
+         if(!regEx.test(string)){
+           return "invalid e-mail alert 3";
+        }
+            return true;
+    }
+};
+
+Validation.prototype.isValidNameSurname= function(string){
+    var dot=".";  
+	regEx=/\s/; 
+    
+	 if((string.length) > 30){
+        return "invalid name&surname alert 2";
+    }
+	//isim soy isim kombinasyonunda en az bir boþluk olmalý ve boþluk yerine nokta konmamalý.
+    if(!regEx.test(string)  || string.indexOf(dot,0) != -1) {
+		return "invalid name&surname alert 1";
+    }	
+	else { 
+		return true;
+	}     
+};
+
+Validation.prototype.isValidZipCode= function(string){    
+	regEx=/\s/;
+	regEx2=/[^0-9]/;
+    //boþluk içeren sayý kombinasyonu valid olmamalý.
+	if(regEx.test(string)){
+		return "invalid zipcode alert 1";
+	}
+	//sadece sayýlardan oluþmalý.
+	 if(regEx2.test(string)){
+        return "invalid zipcode alert 2";
+    }	
+    if( (string.length) != 5){
+		return "invalid zipcode alert 3";
+	}     
+	else { 
+	return true;
+	}
+};
+
+
+Validation Testleri:
+
+describe("E-mail Validation", function () {
+    var emailValidation;
+	beforeEach(function (){
+	emailValidation = new Validation();
+	});
+	
+	describe("For e-mail validation", function () {
+
+		it("should return invalid e-mail alert 1 with osman.yuksel@tart", function (){
+			var result = emailValidation.isValidEmail("osman.yuksel@tart");
+			expect(result).toEqual("invalid e-mail alert 1");
+		});
+
+		it("should return invalid e-mail alert 2 with osman.yuksel@tart.com.local", function (){
+			var result = emailValidation.isValidEmail("osman.yuksel@tart.com.local");
+			expect(result).toEqual("invalid e-mail alert 2");
+		});
+
+		it("should return invalid e-mail alert 3 with osman.yüksel@tart.com.tr", function (){
+			var result = emailValidation.isValidEmail("osman.yüksel@tart.com.tr");
+			expect(result).toEqual("invalid e-mail alert 3");
+		});
+
+		it("should return true with osman.yuksel@tart.com.tr", function (){
+			var result = emailValidation.isValidEmail("osman.yuksel@tart.com.tr");
+			expect(result).toEqual(true);
+		});
+    });
+});
+
+describe("Name&Surname Validation", function () {
+
+	var namesurnameValidation;
+	beforeEach(function (){
+		namesurnameValidation = new Validation();
+	});
+			
+	describe("For name&surname validation", function () {
+
+		it("should return invalid name&surname alert 1 with Osman.Yuksel", function (){
+			var result = namesurnameValidation.isValidNameSurname("Osman.Yuksel");
+			expect(result).toEqual("invalid name&surname alert 1");
+		});
+
+                it("should return invalid name&surname alert 2 with merhaba millet ben otuz karakterden buyugum", function (){
+			var result = namesurnameValidation.isValidNameSurname("merhaba millet ben otuz karakterden buyugum");
+			expect(result).toEqual("invalid name&surname alert 2");
+		});
+
+         it("should return true with Osman Yuksel", function (){
+			var result = namesurnameValidation.isValidNameSurname("Osman Yuksel");
+			expect(result).toEqual(true);
+		});
+	}); 
+});
+	
+describe("ZipCode Validation", function () {
+
+			var zipcodeValidation;
+			beforeEach(function (){
+				zipcodeValidation = new Validation();
+			});
+	
+	describe("For zipcode validation", function () {
+
+		it("should return invalid zipcode alert 1 with 12 34", function (){
+			var result = zipcodeValidation.isValidZipCode("12 34");
+			expect(result).toEqual("invalid zipcode alert 1");
+		});
+
+                it("should return invalid zipcode alert 2 with abcde", function (){
+			var result = zipcodeValidation.isValidZipCode("abcde");
+			expect(result).toEqual("invalid zipcode alert 2");
+		});
+                	
+		it("should return invalid zip code alert 3 with 123456", function (){
+			var result = zipcodeValidation.isValidZipCode("123456");
+			expect(result).toEqual("invalid zipcode alert 3");
+		});
+				
+		it("should return true with 12345", function (){
+			var result = zipcodeValidation.isValidZipCode("12345");
+			expect(result).toEqual(true);
+		});
+	}); 
+});
